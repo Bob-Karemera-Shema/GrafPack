@@ -53,6 +53,7 @@ namespace GrafPack
             MenuItem rotateItem = new MenuItem();
             MenuItem reflectItem = new MenuItem();
             MenuItem translateItem = new MenuItem();
+            MenuItem scaleItem = new MenuItem();
 
             //Assign Text values to menu items
             createItem.Text = "&Create";
@@ -65,6 +66,7 @@ namespace GrafPack
             rotateItem.Text = "&Rotate";
             reflectItem.Text = "&Reflect";
             translateItem.Text = "&Translate";
+            scaleItem.Text = "&Scale";
             
             //Add menu items to the mainMenu object
             mainMenu.MenuItems.Add(createItem);
@@ -77,6 +79,7 @@ namespace GrafPack
             transformItem.MenuItems.Add(rotateItem);
             transformItem.MenuItems.Add(reflectItem);
             transformItem.MenuItems.Add(translateItem);
+            transformItem.MenuItems.Add(scaleItem);
 
             //Add mouse click listeners to the menu items
             selectItem.Click += new System.EventHandler(this.selectShape);
@@ -84,9 +87,10 @@ namespace GrafPack
             squareItem.Click += new System.EventHandler(this.selectSquare);
             triangleItem.Click += new System.EventHandler(this.selectTriangle);
             circleItem.Click += new System.EventHandler(this.selectCircle);
-            rotateItem.Click += new System.EventHandler(this.rotateShape);
+            rotateItem.Click += new System.EventHandler(this.rotateShapeHandler);
             reflectItem.Click += new System.EventHandler(this.reflectShape);
             translateItem.Click += new System.EventHandler(this.translateShape);
+            scaleItem.Click += new System.EventHandler(this.scaleShapeHandler);
 
             //assign menu object to this form's menu
             this.Menu = mainMenu;
@@ -155,7 +159,7 @@ namespace GrafPack
         {
         }
 
-        private void rotateShape(object sender, EventArgs e)
+        private void rotateShapeHandler(object sender, EventArgs e)
         {
             selectShapeStatus=false;
             try
@@ -166,6 +170,27 @@ namespace GrafPack
 
                 //rotate shape with provided angle
                 rotateShape(angle);
+
+                //Redraw shapes to show rotation
+                drawShapes();
+            }
+            catch (Exception exception)
+            { }
+        }
+
+        private void scaleShapeHandler(object sender, EventArgs e)
+        {
+            selectShapeStatus = false;
+            try
+            {
+                //Get scaling factors from user
+                int scaleX = int.Parse(Interaction.InputBox("Enter scaling factor for X coordinates",
+                    "Scaling", "0"));
+                int scaleY = int.Parse(Interaction.InputBox("Enter scaling factor for Y coordinates",
+                    "Scaling", "0"));
+
+                //rotate shape with provided angle
+                scaleShape(scaleX, scaleY);
 
                 //Redraw shapes to show rotation
                 drawShapes();
@@ -286,6 +311,21 @@ namespace GrafPack
             }
         }
 
+        private void scaleShape(int scaleX, int scaleY)
+        {
+            int count = 0;
+
+            foreach (Shape shape in shapes)
+            {
+                if (count == selectionCount)
+                {
+                    shape.scale(scaleX, scaleY);
+                    break;
+                }
+                count++;
+            }
+        }
+
         private void addShape()
         {
             if (selectSquareStatus == true)
@@ -355,6 +395,10 @@ namespace GrafPack
         }
 
         public virtual void translate(int transX, int transY)
+        {
+        }
+
+        public virtual void scale(int scaleX, int scaleY)
         {
         }
     }
@@ -459,6 +503,22 @@ namespace GrafPack
             newPt2.X += transX;
             newPt2.Y += transY;
         }
+
+        public override void scale(int scaleX, int scaleY)
+        {
+            //scale shape vertices
+            keyPt.X *= scaleX;
+            keyPt.Y *= scaleY;
+
+            oppPt.X *= scaleX;
+            oppPt.Y *= scaleY;
+
+            newPt1.X *= scaleX;
+            newPt1.Y *= scaleY;
+
+            newPt2.X *= scaleX;
+            newPt2.Y *= scaleY;
+        }
     }
 
     class Triangle : Shape
@@ -540,6 +600,7 @@ namespace GrafPack
             oppPt = matrix[1];
             newPt = matrix[2];
         }
+
         public override void translate(int transX, int transY)
         {
             //translate shape vertices
@@ -551,6 +612,19 @@ namespace GrafPack
 
             newPt.X += transX;
             newPt.Y += transY;
+        }
+
+        public override void scale(int scaleX, int scaleY)
+        {
+            //scale shape vertices
+            keyPt.X *= scaleX;
+            keyPt.Y *= scaleY;
+
+            oppPt.X *= scaleX;
+            oppPt.Y *= scaleY;
+
+            newPt.X *= scaleX;
+            newPt.Y *= scaleY;
         }
     }
 
@@ -663,6 +737,16 @@ namespace GrafPack
 
             oppPt.X += transX;
             oppPt.Y += transY;
+        }
+
+        public override void scale(int scaleX, int scaleY)
+        {
+            //scale shape vertices
+            keyPt.X *= scaleX;
+            keyPt.Y *= scaleY;
+
+            oppPt.X *= scaleX;
+            oppPt.Y *= scaleY;
         }
     }
 }
