@@ -82,15 +82,15 @@ namespace GrafPack
             transformItem.MenuItems.Add(scaleItem);
 
             //Add mouse click listeners to the menu items
-            selectItem.Click += new System.EventHandler(this.selectShape);
+            selectItem.Click += new System.EventHandler(this.selectShapeHandler);
             deleteItem.Click += new System.EventHandler(this.deleteShape);
             squareItem.Click += new System.EventHandler(this.selectSquare);
             triangleItem.Click += new System.EventHandler(this.selectTriangle);
             circleItem.Click += new System.EventHandler(this.selectCircle);
-            rotateItem.Click += new System.EventHandler(this.rotateShapeHandler);
+            rotateItem.Click += new System.EventHandler(this.rotateShape);
             reflectItem.Click += new System.EventHandler(this.reflectShape);
             translateItem.Click += new System.EventHandler(this.translateShape);
-            scaleItem.Click += new System.EventHandler(this.scaleShapeHandler);
+            scaleItem.Click += new System.EventHandler(this.scaleShape);
 
             //assign menu object to this form's menu
             this.Menu = mainMenu;
@@ -120,11 +120,11 @@ namespace GrafPack
             selectShapeStatus = false;
         }
 
-        private void selectShape(object sender, EventArgs e)
+        private void selectShapeHandler(object sender, EventArgs e)
         {
             selectShapeStatus = true;
             selectionCount = 0;
-            selectingShape();
+            selectShape();
         }
 
         private void deleteShape(object sender, EventArgs e)
@@ -146,7 +146,17 @@ namespace GrafPack
                     "Translation", "0"));
 
                 //translate shape with given constants
-                translateShape(transX, transY);
+                int count = 0;
+
+                foreach (Shape shape in shapes)
+                {
+                    if (count == selectionCount)
+                    {
+                        shape.translate(transX, transY);
+                        break;
+                    }
+                    count++;
+                }
 
                 //Redraw shapes to show rotation
                 drawShapes();
@@ -157,9 +167,37 @@ namespace GrafPack
 
         private void reflectShape(object sender, EventArgs e)
         {
+            selectShapeStatus = false;
+            try
+            {
+                //Get reflection mirror from user
+                string mirror = Interaction.InputBox("In this application a shape can be reflected with respect to three mirrors" +
+                    "given by the following lines:\n 1. the X-axis (X)\n 2. the Y-axis (Y)\n 3. the line Y=X (XY)\n 4. the line through the origin (O)" +
+                    "\n Enter the mirror line of your choice as shown using brackets above. Make sure to use capital letters.\n",
+                    "Translation", "0");
+
+                //rotate shape in respect to given mirror
+                int count = 0;
+                int[] windowSize = {this.Width, this.Height};
+
+                foreach (Shape shape in shapes)
+                {
+                    if (count == selectionCount)
+                    {
+                        shape.reflect(mirror, windowSize);
+                        break;
+                    }
+                    count++;
+                }
+
+                //Redraw shapes to show rotation
+                drawShapes();
+            }
+            catch (Exception exception)
+            { }
         }
 
-        private void rotateShapeHandler(object sender, EventArgs e)
+        private void rotateShape(object sender, EventArgs e)
         {
             selectShapeStatus=false;
             try
@@ -169,7 +207,17 @@ namespace GrafPack
                     "Rotation", "0"));
 
                 //rotate shape with provided angle
-                rotateShape(angle);
+                int count = 0;
+
+                foreach (Shape shape in shapes)
+                {
+                    if (count == selectionCount)
+                    {
+                        shape.rotate(angle);
+                        break;
+                    }
+                    count++;
+                }
 
                 //Redraw shapes to show rotation
                 drawShapes();
@@ -178,7 +226,7 @@ namespace GrafPack
             { }
         }
 
-        private void scaleShapeHandler(object sender, EventArgs e)
+        private void scaleShape(object sender, EventArgs e)
         {
             selectShapeStatus = false;
             try
@@ -190,13 +238,48 @@ namespace GrafPack
                     "Scaling", "0"));
 
                 //rotate shape with provided angle
-                scaleShape(scaleX, scaleY);
+                int count = 0;
+
+                foreach (Shape shape in shapes)
+                {
+                    if (count == selectionCount)
+                    {
+                        shape.scale(scaleX, scaleY);
+                        break;
+                    }
+                    count++;
+                }
 
                 //Redraw shapes to show rotation
                 drawShapes();
             }
             catch (Exception exception)
             { }
+        }
+
+        private void selectShape()
+        {
+            //method to selet a shape on the screen
+            Refresh();
+
+            int count = 0;
+            Graphics g = this.CreateGraphics();
+            Pen blackpen = new Pen(Color.Black);
+
+            //Declare and initialise selection pen
+            Pen selectionPen = new Pen(Color.Red, 5);
+            selectionPen.Alignment = PenAlignment.Center;
+
+            foreach (Shape shape in shapes)
+            {
+                shape.draw(g, blackpen);
+                if (count == selectionCount)
+                {
+                    shape.draw(g, selectionPen);    //Redraw selected shape with new pen
+                }
+
+                count++;
+            }
         }
 
         private void GrafPack_Load(object sender, EventArgs e)
@@ -244,85 +327,15 @@ namespace GrafPack
                 {
                     selectionCount++;
                     if (selectionCount > shapes.Count) selectionCount = shapes.Count;
-                    selectingShape();
+                    selectShape();
                 }
 
                 if (e.KeyCode == Keys.Down)
                 {
                     selectionCount--;
                     if (selectionCount < 0) selectionCount = 0;
-                    selectingShape();
+                    selectShape();
                 }
-            }
-        }
-
-        private void selectingShape()
-        {
-            //method to selet a shape on the screen
-            Refresh();
-
-            int count = 0;
-            Graphics g = this.CreateGraphics();
-            Pen blackpen = new Pen(Color.Black);
-
-            //Declare and initialise selection pen
-            Pen selectionPen = new Pen(Color.Red, 5);
-            selectionPen.Alignment = PenAlignment.Center;
-
-            foreach (Shape shape in shapes)
-            {
-                shape.draw(g, blackpen);
-                if (count == selectionCount)
-                {
-                    shape.draw(g, selectionPen);
-                }
-
-                count++;
-            }
-        }
-
-        private void rotateShape(int angle)
-        {
-            int count = 0;
-
-            foreach (Shape shape in shapes)
-            {
-                if (count == selectionCount)
-                {
-                    shape.rotate(angle);
-                    break;
-                }
-                count++;
-            }
-        }
-
-        private void translateShape(int transX, int transY)
-        {
-            int count = 0;
-
-            foreach (Shape shape in shapes)
-            {
-                if (count == selectionCount)
-                {
-                    shape.translate(transX, transY);
-                    break;
-                }
-                count++;
-            }
-        }
-
-        private void scaleShape(int scaleX, int scaleY)
-        {
-            int count = 0;
-
-            foreach (Shape shape in shapes)
-            {
-                if (count == selectionCount)
-                {
-                    shape.scale(scaleX, scaleY);
-                    break;
-                }
-                count++;
             }
         }
 
@@ -376,7 +389,9 @@ namespace GrafPack
     {
         // This is the base class for Shapes in the application. It should allow an array or LL
         // to be created containing different kinds of shapes.
-        protected double xDiff, yDiff, xMid, yMid;   // range and mid points of x & y 
+        protected double xDiff, yDiff, xMid, yMid;   // range and mid points of x & y
+        protected bool creating;                     // boolean to determine whether the shape is being created for the first time 
+                                                     // or being redrawn
 
         public Shape()   // constructor
         {            
@@ -401,6 +416,10 @@ namespace GrafPack
         public virtual void scale(int scaleX, int scaleY)
         {
         }
+
+        public virtual void reflect(string mirror, int[] windowSize)
+        {
+        }
     }
     
     class Square : Shape
@@ -412,11 +431,12 @@ namespace GrafPack
         {
             this.keyPt = keyPt;
             this.oppPt = oppPt;
+            this.creating = true;
         }
 
         protected override void calculateRangesAndMidpoints()
         {
-            // calculate ranges and mid points
+            // calculate ranges and mid points to obtain the other two vertices of a the square
             xDiff = oppPt.X - keyPt.X;
             yDiff = oppPt.Y - keyPt.Y;
             xMid = (oppPt.X + keyPt.X) / 2;
@@ -427,15 +447,18 @@ namespace GrafPack
         {
             // This method draws the square by calculating the positions of the other 2 corners
 
-            calculateRangesAndMidpoints();
+            if (creating)
+            {
+                creating = false;
+                calculateRangesAndMidpoints();
 
-            //assign new found vertices
-            newPt1.X = (int)(xMid + yDiff / 2);
-            newPt1.Y = (int)(yMid - xDiff / 2);
+                //assign new found vertices
+                newPt1.X = (int)(xMid + yDiff / 2);
+                newPt1.Y = (int)(yMid - xDiff / 2);
 
-            newPt2.X = (int)(xMid - yDiff / 2);
-            newPt2.Y = (int)(yMid + xDiff / 2);
-
+                newPt2.X = (int)(xMid - yDiff / 2);
+                newPt2.Y = (int)(yMid + xDiff / 2);
+            }
             // draw square
             g.DrawLine(blackPen, (int)keyPt.X, (int)keyPt.Y, (int)newPt1.X, (int)newPt1.Y);
             g.DrawLine(blackPen, (int)newPt1.X, (int)newPt1.Y, (int)oppPt.X, (int)oppPt.Y);
@@ -519,6 +542,54 @@ namespace GrafPack
             newPt2.X *= scaleX;
             newPt2.Y *= scaleY;
         }
+
+        public override void reflect(string mirror, int[] windowSize)
+        {
+            Point[] points = { keyPt, oppPt, newPt1, newPt2 };
+            Point[] matrix = new Point[points.Length];
+
+            if (mirror.Equals("X"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = points[i].X;
+                    matrix[i].Y = windowSize[1] - points[i].Y;
+                }
+            }
+
+            if (mirror.Equals("Y"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = windowSize[0] - points[i].X;
+                    matrix[i].Y = points[i].Y;
+                }
+            }
+
+            if (mirror.Equals("XY"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = points[i].Y;
+                    matrix[i].Y = points[i].X;
+                }
+            }
+
+            if (mirror.Equals("O"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = windowSize[0] - points[i].X;
+                    matrix[i].Y = windowSize[1] - points[i].Y;
+                }
+            }
+
+            //Update Square vertices after rotation
+            keyPt = matrix[0];
+            oppPt = matrix[1];
+            newPt1 = matrix[2];
+            newPt2 = matrix[3];
+        }
     }
 
     class Triangle : Shape
@@ -530,6 +601,7 @@ namespace GrafPack
         {
             this.keyPt = keyPt;
             this.oppPt = oppPt;
+            this.creating = true;
         }
 
         protected override void calculateRangesAndMidpoints()
@@ -545,11 +617,15 @@ namespace GrafPack
         {
             // This method draws the triangle by calculating the positions of the other 2 corners
 
-            calculateRangesAndMidpoints();
+            if (creating)
+            {
+                creating = false;
+                calculateRangesAndMidpoints();
 
-            //assign new found vertex
-            newPt.X = (int)(xMid + yDiff / 2);
-            newPt.Y = (int)(yMid - xDiff / 2);
+                //assign new found vertex
+                newPt.X = (int)(xMid + yDiff / 2);
+                newPt.Y = (int)(yMid - xDiff / 2);
+            }
 
             // draw triangle
             g.DrawLine(blackPen, (int)keyPt.X, (int)keyPt.Y, (int)newPt.X, (int)newPt.Y);
@@ -626,6 +702,53 @@ namespace GrafPack
             newPt.X *= scaleX;
             newPt.Y *= scaleY;
         }
+
+        public override void reflect(string mirror, int[] windowSize)
+        {
+            Point[] points = { keyPt, oppPt, newPt };
+            Point[] matrix = new Point[points.Length];
+
+            if (mirror.Equals("X"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = points[i].X;
+                    matrix[i].Y = windowSize[1] - points[i].Y;
+                }
+            }
+
+            if (mirror.Equals("Y"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = windowSize[0] - points[i].X;
+                    matrix[i].Y = points[i].Y;
+                }
+            }
+
+            if (mirror.Equals("XY"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = points[i].Y;
+                    matrix[i].Y = points[i].X;
+                }
+            }
+
+            if (mirror.Equals("O"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = windowSize[0] - points[i].X;
+                    matrix[i].Y = windowSize[1] - points[i].Y;
+                }
+            }
+
+            //Update Square vertices after rotation
+            keyPt = matrix[0];
+            oppPt = matrix[1];
+            newPt = matrix[2];
+        }
     }
 
     class Circle : Shape
@@ -637,6 +760,7 @@ namespace GrafPack
         {
             this.keyPt = keyPt;
             this.oppPt = oppPt;
+            this.creating = true;
         }
 
         private void putPixel(Graphics g, Point pixel, Color brushColor)
@@ -747,6 +871,52 @@ namespace GrafPack
 
             oppPt.X *= scaleX;
             oppPt.Y *= scaleY;
+        }
+
+        public override void reflect(string mirror, int[] windowSize)
+        {
+            Point[] points = { keyPt, oppPt };
+            Point[] matrix = new Point[points.Length];
+
+            if (mirror.Equals("X"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = points[i].X;
+                    matrix[i].Y = windowSize[1] - points[i].Y;
+                }
+            }
+
+            if (mirror.Equals("Y"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = windowSize[0] - points[i].X;
+                    matrix[i].Y = points[i].Y;
+                }
+            }
+
+            if (mirror.Equals("XY"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = points[i].Y;
+                    matrix[i].Y = points[i].X;
+                }
+            }
+
+            if (mirror.Equals("O"))
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    matrix[i].X = windowSize[0] - points[i].X;
+                    matrix[i].Y = windowSize[1] - points[i].Y;
+                }
+            }
+
+            //Update Square vertices after rotation
+            keyPt = matrix[0];
+            oppPt = matrix[1];
         }
     }
 }
