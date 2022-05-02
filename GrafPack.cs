@@ -27,6 +27,8 @@ namespace GrafPack
 
         //Declare a shape list to store all shapes drawn to the screen
         private List<Shape> shapes;
+        //Declare a shape object to draw draw the shape progressively as the user
+        private Shape currentView;
 
         //Declare and innitialise bool variable to determine whether the mouse is held down or not
         private bool isMouseDown = false;
@@ -231,10 +233,8 @@ namespace GrafPack
             selectShapeStatus = false;
             try
             {
-                //Get scaling factors from user
-                int scaleX = int.Parse(Interaction.InputBox("Enter scaling factor for X coordinates",
-                    "Scaling", "0"));
-                int scaleY = int.Parse(Interaction.InputBox("Enter scaling factor for Y coordinates",
+                //Get scaling factor from user
+                float scaleFactor = float.Parse(Interaction.InputBox("Enter scaling factor for selected shape",
                     "Scaling", "0"));
 
                 //rotate shape with provided angle
@@ -244,7 +244,7 @@ namespace GrafPack
                 {
                     if (count == selectionCount)
                     {
-                        shape.scale(scaleX, scaleY);
+                        shape.scale(scaleFactor);
                         break;
                     }
                     count++;
@@ -301,6 +301,30 @@ namespace GrafPack
             if (isMouseDown)
             {
                 two = e.Location;
+
+                Refresh();
+
+                //draw other shapes currently on the screen
+                drawShapes();
+
+                //draw current view
+                if (selectSquareStatus == true)
+                {
+                    currentView = new Square(one, two);
+                    currentView.draw(this.CreateGraphics(), new Pen(Color.Black));
+                }
+
+                if (selectTriangleStatus == true)
+                {
+                    currentView = new Triangle(one, two);
+                    currentView.draw(this.CreateGraphics(), new Pen(Color.Black));
+                }
+
+                if (selectCircleStatus == true)
+                {
+                    currentView = new Circle(one, two);
+                    currentView.draw(this.CreateGraphics(), new Pen(Color.Black));
+                }
             }
         }
 
@@ -413,7 +437,7 @@ namespace GrafPack
         {
         }
 
-        public virtual void scale(int scaleX, int scaleY)
+        public virtual void scale(float scaleFactor)
         {
         }
 
@@ -527,20 +551,20 @@ namespace GrafPack
             newPt2.Y += transY;
         }
 
-        public override void scale(int scaleX, int scaleY)
+        public override void scale(float scaleFactor)
         {
             //scale shape vertices
-            keyPt.X *= scaleX;
-            keyPt.Y *= scaleY;
+            keyPt.X = (int)(keyPt.X * scaleFactor);
+            keyPt.Y = (int)(keyPt.Y * scaleFactor);
 
-            oppPt.X *= scaleX;
-            oppPt.Y *= scaleY;
+            oppPt.X = (int)(oppPt.X * scaleFactor);
+            oppPt.Y = (int)(oppPt.Y * scaleFactor);
 
-            newPt1.X *= scaleX;
-            newPt1.Y *= scaleY;
+            newPt1.X = (int)(newPt1.X * scaleFactor);
+            newPt1.Y = (int)(newPt1.Y * scaleFactor);
 
-            newPt2.X *= scaleX;
-            newPt2.Y *= scaleY;
+            newPt2.X = (int)(newPt2.X * scaleFactor);
+            newPt2.Y = (int)(newPt2.Y * scaleFactor);
         }
 
         public override void reflect(string mirror, int[] windowSize)
@@ -690,17 +714,17 @@ namespace GrafPack
             newPt.Y += transY;
         }
 
-        public override void scale(int scaleX, int scaleY)
+        public override void scale(float scaleFactor)
         {
             //scale shape vertices
-            keyPt.X *= scaleX;
-            keyPt.Y *= scaleY;
+            keyPt.X = (int)(keyPt.X * scaleFactor);
+            keyPt.Y = (int)(keyPt.Y * scaleFactor);
 
-            oppPt.X *= scaleX;
-            oppPt.Y *= scaleY;
+            oppPt.X = (int)(oppPt.X * scaleFactor);
+            oppPt.Y = (int)(oppPt.Y * scaleFactor);
 
-            newPt.X *= scaleX;
-            newPt.Y *= scaleY;
+            newPt.X = (int)(newPt.X * scaleFactor);
+            newPt.Y = (int)(newPt.Y * scaleFactor);
         }
 
         public override void reflect(string mirror, int[] windowSize)
@@ -863,14 +887,14 @@ namespace GrafPack
             oppPt.Y += transY;
         }
 
-        public override void scale(int scaleX, int scaleY)
+        public override void scale(float scaleFactor)
         {
             //scale shape vertices
-            keyPt.X *= scaleX;
-            keyPt.Y *= scaleY;
+            keyPt.X = (int)(keyPt.X * scaleFactor);
+            keyPt.Y = (int)(keyPt.Y * scaleFactor);
 
-            oppPt.X *= scaleX;
-            oppPt.Y *= scaleY;
+            oppPt.X = (int)(oppPt.X * scaleFactor);
+            oppPt.Y = (int)(oppPt.Y * scaleFactor);
         }
 
         public override void reflect(string mirror, int[] windowSize)
