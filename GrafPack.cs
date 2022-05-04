@@ -1147,6 +1147,46 @@ namespace GrafPack
         {
             //Rotating a circle will always give the same circle
             //Therefore when rotating a circle it is left the way it is
+            //regardless the code written below is just for comparison purposes
+            Point[] points = { keyPt, oppPt };
+            Point[] matrix = new Point[points.Length];
+
+            int centreX, centreY;
+            int sumX = 0;
+            int sumY = 0;
+
+            // get centre
+            foreach (Point p in points)
+            {
+                sumX += p.X;
+                sumY += p.Y;
+            }
+
+            centreX = sumX / points.Length;
+            centreY = sumY / points.Length;
+
+            // translate shape to origin
+            for (int i = 0; i < points.Length; i++)
+            {
+                matrix[i].X = points[i].X - centreX;
+                matrix[i].Y = points[i].Y - centreY;
+            }
+
+            float cosa = (float)Math.Cos(angle * Math.PI / 180.0);
+            float sina = (float)Math.Sin(angle * Math.PI / 180.0);
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                float X = matrix[i].X * cosa - matrix[i].Y * sina;
+                float Y = matrix[i].X * sina + matrix[i].Y * cosa;
+
+                matrix[i].X = (int)X + centreX;
+                matrix[i].Y = (int)Y + centreY;
+            }
+
+            //Update Square vertices after rotation
+            keyPt = matrix[0];
+            oppPt = matrix[1];
         }
 
         public override void translate(int transX, int transY)
