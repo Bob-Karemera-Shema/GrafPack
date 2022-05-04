@@ -378,9 +378,13 @@ namespace GrafPack
         private void GrafPack_MouseDown(object sender, MouseEventArgs e)
         {
             //Mouse down event handler method
-            isMouseDown = true;
 
-            one = e.Location;
+            if (e.Button == MouseButtons.Left)
+            {
+                isMouseDown = true;
+
+                one = e.Location;
+            }
         }
 
         private void GrafPack_MouseMove(object sender, MouseEventArgs e)
@@ -729,15 +733,6 @@ namespace GrafPack
             this.creating = true;
         }
 
-        protected override void calculateRangesAndMidpoints()
-        {
-            // calculate ranges and mid points to obtain the other two vertices of a the square
-            xDiff = oppPt.X - keyPt.X;
-            yDiff = oppPt.Y - keyPt.Y;
-            xMid = (oppPt.X + keyPt.X) / 2;
-            yMid = (oppPt.Y + keyPt.Y) / 2;
-        }
-
         public override void draw(Graphics g, Pen blackPen)
         {
             // This method draws the square by calculating the positions of the other 2 corners
@@ -745,7 +740,6 @@ namespace GrafPack
             if (creating)
             {
                 creating = false;
-                calculateRangesAndMidpoints();
 
                 // (x1,y1),(x1,y2),(x2,y2),(x2,y1)
                 //assign new found vertices
