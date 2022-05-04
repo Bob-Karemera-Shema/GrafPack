@@ -184,7 +184,7 @@ namespace GrafPack
 
             foreach (Shape shape in shapes)
             {
-                shape.draw(g, selectionPen);    //Redraw selected shape with new pen
+                shape.draw(g, selectionPen);    //Redraw selected shapes with red pen
             }
         }
 
@@ -216,9 +216,6 @@ namespace GrafPack
             selectShapeStatus = false;
             try
             {
-                MessageBox.Show("Ensure not to use large translation factors to avoid the shape being translated" +
-                    "beyond the screen surface");
-
                 //Get angle of rotation from user
                 int transX = int.Parse(Interaction.InputBox("Translate X coordinates by: ",
                     "Translation", "0"));
@@ -237,12 +234,13 @@ namespace GrafPack
                     }
                     count++;
                 }
-
-                //Redraw shapes to show rotation
-                drawShapes();
             }
             catch (Exception exception)
             { }
+
+            Refresh();
+            //Redraw shapes to show translation
+            drawShapes();
         }
 
         private void reflectShape(object sender, EventArgs e)
@@ -257,7 +255,7 @@ namespace GrafPack
                     "given by the following lines:\n 1. the X-axis (X)\n 2. the Y-axis (Y)\n 3. the line Y=X (XY)\n 4. the line " +
                     "through the origin (O)" +
                     "\n Enter the mirror line of your choice as shown using brackets above. Make sure to use capital letters.\n",
-                    "Translation", "0");
+                    "Reflection");
 
                 //rotate shape in respect to given mirror
                 int count = 0;
@@ -272,12 +270,13 @@ namespace GrafPack
                     }
                     count++;
                 }
-
-                //Redraw shapes to show rotation
-                drawShapes();
             }
             catch (Exception exception)
             { }
+
+            Refresh();
+            //Redraw shapes to show reflection
+            drawShapes();
         }
 
         private void rotateShape(object sender, EventArgs e)
@@ -303,12 +302,13 @@ namespace GrafPack
                     }
                     count++;
                 }
-
-                //Redraw shapes to show rotation
-                drawShapes();
             }
             catch (Exception exception)
             { }
+
+            Refresh();
+            //Redraw shapes to show rotation
+            drawShapes();
         }
 
         private void scaleShape(object sender, EventArgs e)
@@ -337,12 +337,13 @@ namespace GrafPack
                     }
                     count++;
                 }
-
-                //Redraw shapes to show rotation
-                drawShapes();
             }
             catch (Exception exception)
             { }
+
+            Refresh();
+            //Redraw shapes to show scaling
+            drawShapes();
         }
 
         private void selectShape()
@@ -448,7 +449,7 @@ namespace GrafPack
                 if (e.KeyCode == Keys.Up)
                 {
                     selectionCount++;
-                    if (selectionCount > shapes.Count) selectionCount = shapes.Count;
+                    if (selectionCount > shapes.Count) selectionCount = shapes.Count - 1;
                     selectShape();
                 }
 
@@ -659,17 +660,17 @@ namespace GrafPack
         public override void scale(float scaleFactor)
         {
             //scale shape vertices
-            keyPt.X = (int)(keyPt.X * scaleFactor);
-            keyPt.Y = (int)(keyPt.Y * scaleFactor);
+            keyPt.X = (int)Math.Round(keyPt.X * scaleFactor);
+            keyPt.Y = (int)Math.Round(keyPt.Y * scaleFactor);
 
-            oppPt.X = (int)(oppPt.X * scaleFactor);
-            oppPt.Y = (int)(oppPt.Y * scaleFactor);
+            oppPt.X = (int)Math.Round(oppPt.X * scaleFactor);
+            oppPt.Y = (int)Math.Round(oppPt.Y * scaleFactor);
 
-            newPt1.X = (int)(newPt1.X * scaleFactor);
-            newPt1.Y = (int)(newPt1.Y * scaleFactor);
+            newPt1.X = (int)Math.Round(newPt1.X * scaleFactor);
+            newPt1.Y = (int)Math.Round(newPt1.Y * scaleFactor);
 
-            newPt2.X = (int)(newPt2.X * scaleFactor);
-            newPt2.Y = (int)(newPt2.Y * scaleFactor);
+            newPt2.X = (int)Math.Round(newPt2.X * scaleFactor);
+            newPt2.Y = (int)Math.Round(newPt2.Y * scaleFactor);
         }
 
         public override void reflect(string mirror, int[] windowSize)
@@ -820,17 +821,17 @@ namespace GrafPack
         public override void scale(float scaleFactor)
         {
             //scale shape vertices
-            keyPt.X = (int)(keyPt.X * scaleFactor);
-            keyPt.Y = (int)(keyPt.Y * scaleFactor);
+            keyPt.X = (int)Math.Round(keyPt.X * scaleFactor);
+            keyPt.Y = (int)Math.Round(keyPt.Y * scaleFactor);
 
-            oppPt.X = (int)(oppPt.X * scaleFactor);
-            oppPt.Y = (int)(oppPt.Y * scaleFactor);
+            oppPt.X = (int)Math.Round(oppPt.X * scaleFactor);
+            oppPt.Y = (int)Math.Round(oppPt.Y * scaleFactor);
 
-            newPt1.X = (int)(newPt1.X * scaleFactor);
-            newPt1.Y = (int)(newPt1.Y * scaleFactor);
+            newPt1.X = (int)Math.Round(newPt1.X * scaleFactor);
+            newPt1.Y = (int)Math.Round(newPt1.Y * scaleFactor);
 
-            newPt2.X = (int)(newPt2.X * scaleFactor);
-            newPt2.Y = (int)(newPt2.Y * scaleFactor);
+            newPt2.X = (int)Math.Round(newPt2.X * scaleFactor);
+            newPt2.Y = (int)Math.Round(newPt2.Y * scaleFactor);
         }
 
         public override void reflect(string mirror, int[] windowSize)
@@ -983,14 +984,14 @@ namespace GrafPack
         public override void scale(float scaleFactor)
         {
             //scale shape vertices
-            keyPt.X = (int)(keyPt.X * scaleFactor);
-            keyPt.Y = (int)(keyPt.Y * scaleFactor);
+            keyPt.X = (int)Math.Round(keyPt.X * scaleFactor);
+            keyPt.Y = (int)Math.Round(keyPt.Y * scaleFactor);
 
-            oppPt.X = (int)(oppPt.X * scaleFactor);
-            oppPt.Y = (int)(oppPt.Y * scaleFactor);
+            oppPt.X = (int)Math.Round(oppPt.X * scaleFactor);
+            oppPt.Y = (int)Math.Round(oppPt.Y * scaleFactor);
 
-            newPt.X = (int)(newPt.X * scaleFactor);
-            newPt.Y = (int)(newPt.Y * scaleFactor);
+            newPt.X = (int)Math.Round(newPt.X * scaleFactor);
+            newPt.Y = (int)Math.Round(newPt.Y * scaleFactor);
         }
 
         public override void reflect(string mirror, int[] windowSize)
@@ -1196,11 +1197,11 @@ namespace GrafPack
         public override void scale(float scaleFactor)
         {
             //scale shape vertices
-            keyPt.X = (int)(keyPt.X * scaleFactor);
-            keyPt.Y = (int)(keyPt.Y * scaleFactor);
+            keyPt.X = (int)Math.Round(keyPt.X * scaleFactor);
+            keyPt.Y = (int)Math.Round(keyPt.Y * scaleFactor);
 
-            oppPt.X = (int)(oppPt.X * scaleFactor);
-            oppPt.Y = (int)(oppPt.Y * scaleFactor);
+            oppPt.X = (int)Math.Round(oppPt.X * scaleFactor);
+            oppPt.Y = (int)Math.Round(oppPt.Y * scaleFactor);
         }
 
         public override void reflect(string mirror, int[] windowSize)
